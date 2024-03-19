@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "pustaka-booking",
+			"path": "../.."
+		},
+		{
+			"name": "latihan-git",
+			"path": "../../../latihan-git"
+		}
+	],
+	"settings": {}
+}
