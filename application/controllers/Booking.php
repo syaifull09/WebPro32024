@@ -23,7 +23,7 @@ class Booking extends CI_Controller
                 'image' => $user['image'],
                 'user' => $user['nama'],
                 'email' => $user['email'],
-                'tanggal_input' => $user['tanggal_input']
+                'tanggal_input' => $user['tanggal_input'],
             ];
         }
         $dtb = $this->ModelBooking->showtemp(['id_user' => $id_user])->num_rows();
@@ -59,7 +59,7 @@ class Booking extends CI_Controller
             'image' => $d->image,
             'penulis' => $d->pengarang,
             'penerbit' => $d->penerbit,
-            'tahun_terbit' => $d->tahun_terbit
+            'tahun_terbit' => $d->tahun_terbit,
         ];
 
         //cek apakah buku yang di klik booking sudah ada di keranjang
@@ -118,23 +118,23 @@ class Booking extends CI_Controller
     {
         //mengupdate stok dan dibooking di tabel buku saat proses booking diselesaikan
         $this->db->query("UPDATE buku, temp SET buku.dibooking=buku.dibooking+1, buku.stok=buku.stok-1 WHERE buku.id=temp.id_buku");
-  
+
         $tglsekarang = date('Y-m-d');
         $isibooking = [
             'id_booking' => $this->ModelBooking->kodeOtomatis('booking', 'id_booking'),
             'tgl_booking' => date('Y-m-d H:m:s'),
             'batas_ambil' => date('Y-m-d', strtotime('+2 days', strtotime($tglsekarang))),
-            'id_user' => $where
+            'id_user' => $where,
         ];
-  
+
         //menyimpan ke tabel booking dan detail booking, dan mengosongkan tabel temporari
         $this->ModelBooking->insertData('booking', $isibooking);
         $this->ModelBooking->simpanDetail($where);
         $this->ModelBooking->kosongkanData('temp');
-  
+
         redirect(base_url() . 'booking/info');
     }
-  
+
     public function info()
     {
         $where = $this->session->userdata('id_user');
@@ -150,21 +150,32 @@ class Booking extends CI_Controller
     }
 
     public function exportToPdf()
-        {
-            $id_user = $this->session->userdata('id_user');
-            $data['user'] = $this->session->userdata('nama');
-            $data['judul'] = "Cetak Bukti Booking";
-            $data['useraktif'] = $this->ModelUser->cekData(['id' => $this->session->userdata('id_user')])->result();
+    {
+        $id_user = $this->session->userdata('id_user');
+        $data['user'] = $this->session->userdata('nama');
+        $data['judul'] = "Cetak Bukti Booking";
+        $data['useraktif'] = $this->ModelUser->cekData(['id' => $this->session->userdata('id_user')])->result();
+        $data1 = $this->db->query("select*from booking bo, booking_detail d, buku bu where d.id_booking=bo.id_booking and d.id_buku=bu.id and bo.id_user='$id_user'")->num_rows();
+        if ($data1 < 1) {
+            $this->session->set_flashdata('pesan', '<div class="alert alert-massege alert-danger" role="alert">Tidak Ada Data Booking, Silahkan Lakukan Booking Terlebih Dahulu</div>');
+            redirect(base_url());
+
+        } else {
+
             $data['items'] = $this->db->query("select*from booking bo, booking_detail d, buku bu where d.id_booking=bo.id_booking and d.id_buku=bu.id and bo.id_user='$id_user'")->result_array();
 
+            //script untuk dompdf php versi 5
+            //$this->load->library('dompdf_gen');//
+
             // script untuk dompdf php versi 7.1.0 keatas
-            $sroot      = $_SERVER['DOCUMENT_ROOT'];
-            include $sroot."/pustaka-booking/application/third_party/dompdf/autoload.inc.php";
+            $sroot = $_SERVER['DOCUMENT_ROOT'];
+            include $sroot . "/pustaka-booking/application/third_party/dompdf/autoload.inc.php";
             $dompdf = new Dompdf\Dompdf();
+            //C:\laragon\www\pustaka-booking\application\third_party\dompdf//
 
             $this->load->view('booking/bukti-pdf', $data);
 
-            $paper_size  = 'A4'; // ukuran kertas
+            $paper_size = 'A4'; // ukuran kertas
             $orientation = 'landscape'; //tipe format kertas potrait atau landscape
             $html = $this->output->get_output();
 
@@ -175,5 +186,5 @@ class Booking extends CI_Controller
             $dompdf->stream("bukti-booking-$id_user.pdf", array('Attachment' => 0));
             // nama file pdf yang di hasilkan
         }
-
+    }
 }

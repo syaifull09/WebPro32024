@@ -41,9 +41,8 @@ class User extends CI_Controller
         $data['user'] = $this->ModelUser->cekData(['email' => $this->session->userdata('email')])->row_array();
 
         $this->form_validation->set_rules('nama', 'Nama Lengkap', 'required|trim', [
-            'required' => 'Nama tidak Boleh Kosong'
+            'required' => 'Nama tidak Boleh Kosong',
         ]);
-
 
         if ($this->form_validation->run() == false) {
             $this->load->view('templates/header', $data);
@@ -61,7 +60,7 @@ class User extends CI_Controller
             if ($upload_image) {
                 $config['upload_path'] = './assets/img/profile/';
                 $config['allowed_types'] = 'gif|jpg|png';
-                $config['max_size']     = '3000';
+                $config['max_size'] = '3000';
                 $config['max_width'] = '1024';
                 $config['max_height'] = '1000';
                 $config['file_name'] = 'pro' . time();
@@ -76,7 +75,7 @@ class User extends CI_Controller
 
                     $gambar_baru = $this->upload->data('file_name');
                     $this->db->set('image', $gambar_baru);
-                } else { }
+                } else {}
             }
 
             $this->db->set('nama', $nama);
@@ -94,19 +93,19 @@ class User extends CI_Controller
         $data['user'] = $this->ModelUser->cekData(['email' => $this->session->userdata('email')])->row_array();
 
         $this->form_validation->set_rules('password_sekarang', 'Password Saat ini', 'required|trim', [
-            'required' => 'Password saat ini harus diisi'
+            'required' => 'Password saat ini harus diisi',
         ]);
 
         $this->form_validation->set_rules('password_baru1', 'Password Baru', 'required|trim|min_length[4]|matches[password_baru2]', [
             'required' => 'Password Baru harus diisi',
             'min_length' => 'Password tidak boleh kurang dari 4 digit',
-            'matches' => 'Password Baru tidak sama dengan ulangi password'
+            'matches' => 'Password Baru tidak sama dengan ulangi password',
         ]);
 
         $this->form_validation->set_rules('password_baru2', 'Konfirmasi Password Baru', 'required|trim|min_length[4]|matches[password_baru1]', [
             'required' => 'Ulangi Password harus diisi',
             'min_length' => 'Password tidak boleh kurang dari 4 digit',
-            'matches' => 'Ulangi Password tidak sama dengan password baru'
+            'matches' => 'Ulangi Password tidak sama dengan password baru',
         ]);
 
         if ($this->form_validation->run() == false) {

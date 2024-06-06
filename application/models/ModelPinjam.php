@@ -1,4 +1,6 @@
-<?php if (!defined('BASEPATH')) exit('No Direct Script Access Allowed');
+<?php if (!defined('BASEPATH')) {
+    exit('No Direct Script Access Allowed');
+}
 
 class ModelPinjam extends CI_Model
 {
@@ -29,7 +31,7 @@ class ModelPinjam extends CI_Model
         $this->db->select('*');
         $this->db->from('pinjam');
         $this->db->join('detail_pinjam', 'detail_pinjam.no_pinjam=pinjam.no_pinjam', 'Right');
-        
+
         return $this->db->get()->result_array();
     }
 
